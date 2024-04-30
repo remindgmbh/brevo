@@ -1,0 +1,19 @@
+plugin.tx_form {
+    settings {
+        yamlConfigurations {
+            1674544700 = EXT:rmnd_brevo/Configuration/Form/BaseSetup.yaml
+            1674544705 = EXT:rmnd_brevo/Configuration/Form/FormElementBrevoAttribute.yaml
+            1674548293 = EXT:rmnd_brevo/Configuration/Form/BrevoRegistrationFinisher.yaml
+        }
+    }
+}
+
+module.tx_form {
+    settings {
+        yamlConfigurations {
+            1674544700 = EXT:rmnd_brevo/Configuration/Form/BaseSetup.yaml
+            1674544705 = EXT:rmnd_brevo/Configuration/Form/FormElementBrevoAttribute.yaml
+            1674548293 = EXT:rmnd_brevo/Configuration/Form/BrevoRegistrationFinisher.yaml
+        }
+    }
+}

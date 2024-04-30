@@ -1,0 +1,11 @@
+TYPO3:
+  CMS:
+    Form:
+      prototypes:
+        standard:
+          formEditor:
+            translationFiles:
+              1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"
+          formEngine:
+            translationFiles:
+              1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"

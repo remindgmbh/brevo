@@ -1,0 +1,54 @@
+TYPO3:
+  CMS:
+    Form:
+      prototypes:
+        standard:
+          formElementsDefinition:
+            AdvancedPassword: &brevoAttribute
+              formEditor:
+                editors:
+                  1674544675:
+                    identifier: brevoAttribute
+                    templateName: Inspector-TextEditor
+                    label: formEditor.elements.FormElement.editor.brevoAttribute.label
+                    propertyPath: properties.brevoAttribute
+            Checkbox:
+              <<: *brevoAttribute
+            ContentElement:
+              <<: *brevoAttribute
+            Date:
+              <<: *brevoAttribute
+            Email:
+              <<: *brevoAttribute
+            Fieldset:
+              <<: *brevoAttribute
+            FileUpload:
+              <<: *brevoAttribute
+            GridRow:
+              <<: *brevoAttribute
+            Hidden:
+              <<: *brevoAttribute
+            ImageUpload:
+              <<: *brevoAttribute
+            MultiCheckbox:
+              <<: *brevoAttribute
+            MultiSelect:
+              <<: *brevoAttribute
+            Number:
+              <<: *brevoAttribute
+            Password:
+              <<: *brevoAttribute
+            RadioButton:
+              <<: *brevoAttribute
+            SingleSelect:
+              <<: *brevoAttribute
+            StaticText:
+              <<: *brevoAttribute
+            Telephone:
+              <<: *brevoAttribute
+            Url:
+              <<: *brevoAttribute
+            Text:
+              <<: *brevoAttribute
+            Textarea:
+              <<: *brevoAttribute
