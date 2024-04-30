@@ -1,7 +1,7 @@
 {
     "name": "remind/brevo",
     "type": "typo3-cms-extension",
-    "description": "[DESCRIPTION]",
+    "description": "REMIND - Brevo",
     "license": [ "GPL-3.0-or-later" ],
     "authors": [
         {
