@@ -1,5 +1,5 @@
 {
-    "name": "remind/name",
+    "name": "remind/brevo",
     "type": "typo3-cms-extension",
     "description": "[DESCRIPTION]",
     "license": [ "GPL-3.0-or-later" ],
@@ -11,12 +11,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "Remind\\[NAME]\\": "Classes"
+            "Remind\\Brevo\\": "Classes"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Remind\\[NAME]\\Tests\\": "Tests"
+            "Remind\\Brevo\\Tests\\": "Tests"
         }
     },
     "config": {
@@ -32,7 +32,9 @@
         }
     },
     "require": {
-        "typo3/cms-core": "^12.4"
+        "php": "^8.2",
+	    "getbrevo/brevo-php": "2.0.0",
+        "typo3/cms-core": "^12.4 | ^11.5"
     },
     "require-dev": {
         "slevomat/coding-standard": "^8.14",
@@ -44,7 +46,7 @@
         "typo3/cms": {
             "cms-package-dir": "{$vendor-dir}/typo3/cms",
             "web-dir": ".build/web",
-            "extension-key": "rmnd_name"
+            "extension-key": "rmnd_brevo"
         }
     },
     "scripts": {
