@@ -52,7 +52,7 @@ TYPO3:
                           templateName: Inspector-RemoveElementEditor
           finishersDefinition:
             BrevoRegistration:
-              implementationClassName: Remind\Sendinblue\Domain\Finishers\SendinblueRegistrationFinisher
+              implementationClassName: Remind\Brevo\Domain\Finishers\BrevoRegistrationFinisher
               formEditor:
                 iconIdentifier: form-finisher
               FormEngine:
