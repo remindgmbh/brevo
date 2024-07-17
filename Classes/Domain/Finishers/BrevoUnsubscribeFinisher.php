@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Domain\Finishers;
 
+use Brevo\Client\ApiException;
 use Brevo\Client\Model\RemoveContactFromList;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -33,7 +34,14 @@ class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
 
         if (!empty($contact['emails'])) {
             foreach ($listIds as $listId) {
-                $this->contactsApi->removeContactFromList($listId, $contact);
+                try {
+                    $this->contactsApi->removeContactFromList($listId, $contact);
+                } catch (ApiException $e) {
+                    // catch exception if contact is not in list
+                    if ($e->getCode() !== 400) {
+                        throw $e;
+                    }
+                }
             }
         }
     }
