@@ -4,26 +4,14 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Domain\Finishers;
 
-use Brevo\Client\Api\ContactsApi;
-use Brevo\Client\Configuration;
 use Brevo\Client\Model\CreateDoiContact;
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
-use TYPO3\CMS\Form\Domain\Finishers\AbstractFinisher;
 
-class BrevoRegistrationFinisher extends AbstractFinisher
+class BrevoRegistrationFinisher extends AbstractBrevoFinisher
 {
-/**
-  * This method is called in the concrete finisher whenever self::execute() is called.
-  *
-  * Override and fill with your own implementation!
-  * @return null|string
-  */
     protected function executeInternal()
     {
-        $apiKey = getenv('BREVO_API_KEY');
         $listIds = $this->parseOption('listIds');
         $listIds = GeneralUtility::intExplode(',', $listIds, true);
         $templateId = (int) $this->parseOption('templateId');
@@ -32,12 +20,6 @@ class BrevoRegistrationFinisher extends AbstractFinisher
         $formRuntime = $this->finisherContext->getFormRuntime();
         $formDefinition = $formRuntime->getFormDefinition();
 
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $apiKey);
-        $client = new Client([
-            RequestOptions::CONNECT_TIMEOUT => 5,
-            RequestOptions::TIMEOUT => 5,
-        ]);
-        $apiInstance = new ContactsApi($client, $config);
         $createDoiContact = new CreateDoiContact();
 
         $attributes = [];
@@ -69,6 +51,6 @@ class BrevoRegistrationFinisher extends AbstractFinisher
         $createDoiContact->setIncludeListIds($listIds);
         $createDoiContact->setTemplateId($templateId);
         $createDoiContact->setRedirectionUrl($redirectionUrl);
-        $apiInstance->createDoiContact($createDoiContact);
+        $this->contactsApi->createDoiContact($createDoiContact);
     }
 }

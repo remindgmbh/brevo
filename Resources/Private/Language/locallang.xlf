@@ -21,6 +21,12 @@
             <trans-unit id="formEditor.elements.Form.finisher.BrevoRegistration.editor.redirectPage.buttonLabel">
                 <source>Page</source>
             </trans-unit>
+            <trans-unit id="formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label">
+                <source>Brevo Unsubscribe</source>
+            </trans-unit>
+            <trans-unit id="formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.listIds.label">
+                <source>List IDs (separated by comma)</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

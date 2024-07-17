@@ -4,6 +4,7 @@ plugin.tx_form {
             1674544700 = EXT:rmnd_brevo/Configuration/Form/BaseSetup.yaml
             1674544705 = EXT:rmnd_brevo/Configuration/Form/FormElementBrevoAttribute.yaml
             1674548293 = EXT:rmnd_brevo/Configuration/Form/BrevoRegistrationFinisher.yaml
+            1721194966 = EXT:rmnd_brevo/Configuration/Form/BrevoUnsubscribeFinisher.yaml
         }
     }
 }
@@ -14,6 +15,7 @@ module.tx_form {
             1674544700 = EXT:rmnd_brevo/Configuration/Form/BaseSetup.yaml
             1674544705 = EXT:rmnd_brevo/Configuration/Form/FormElementBrevoAttribute.yaml
             1674548293 = EXT:rmnd_brevo/Configuration/Form/BrevoRegistrationFinisher.yaml
+            1721194966 = EXT:rmnd_brevo/Configuration/Form/BrevoUnsubscribeFinisher.yaml
         }
     }
 }
