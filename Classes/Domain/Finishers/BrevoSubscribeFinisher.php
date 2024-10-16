@@ -10,10 +10,12 @@ use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
 class BrevoSubscribeFinisher extends AbstractBrevoFinisher
 {
-    protected function executeInternal()
+    protected function executeInternal(): ?string
     {
         $listIds = $this->parseOption('listIds');
-        $listIds = GeneralUtility::intExplode(',', $listIds, true);
+        if (!is_array($listIds)) {
+            $listIds = GeneralUtility::intExplode(',', (string) $listIds, true);
+        }
         $templateId = (int) $this->parseOption('templateId');
         $redirectPage = (int) $this->parseOption('redirectPage');
         $formValues = $this->finisherContext->getFormValues();
@@ -25,13 +27,13 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         $attributes = [];
         foreach ($formValues as $key => $value) {
             $element = $formDefinition->getElementByIdentifier($key);
-            $properties = $element->getProperties();
+            $properties = $element?->getProperties();
             $brevoAttribute = $properties['brevoAttribute'] ?? null;
             if ($brevoAttribute) {
                 if ($brevoAttribute === 'EMAIL') {
                     $createDoiContact->setEmail($value);
                 } else {
-                    $type = $element->getType();
+                    $type = $element?->getType();
                     if ($type === 'Checkbox') {
                         $value = (bool) $value;
                     }
@@ -52,5 +54,7 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         $createDoiContact->setTemplateId($templateId);
         $createDoiContact->setRedirectionUrl($redirectionUrl);
         $this->contactsApi->createDoiContact($createDoiContact);
+
+        return null;
     }
 }

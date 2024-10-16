@@ -28,7 +28,7 @@ class BrevoService
         $this->contactsApi = new ContactsApi($client, $config);
     }
 
-    public function getContactsApi()
+    public function getContactsApi(): ContactsApi
     {
         return $this->contactsApi;
     }

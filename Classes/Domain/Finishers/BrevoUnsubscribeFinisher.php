@@ -10,10 +10,12 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
 {
-    protected function executeInternal()
+    protected function executeInternal(): ?string
     {
         $listIds = $this->parseOption('listIds');
-        $listIds = GeneralUtility::intExplode(',', $listIds, true);
+        if (!is_array($listIds)) {
+            $listIds = GeneralUtility::intExplode(',', (string) $listIds, true);
+        }
         $formValues = $this->finisherContext->getFormValues();
         $formRuntime = $this->finisherContext->getFormRuntime();
         $formDefinition = $formRuntime->getFormDefinition();
@@ -26,13 +28,13 @@ class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
                 $properties = $element->getProperties();
                 $brevoAttribute = $properties['brevoAttribute'] ?? null;
                 if ($brevoAttribute === 'EMAIL') {
-                    $contact['emails'] = [$value];
+                    $contact->setEmails([$value]);
                     break;
                 }
             }
         }
 
-        if (!empty($contact['emails'])) {
+        if (!empty($contact->getEmails())) {
             foreach ($listIds as $listId) {
                 try {
                     $this->contactsApi->removeContactFromList($listId, $contact);
@@ -44,5 +46,7 @@ class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
                 }
             }
         }
+
+        return null;
     }
 }
