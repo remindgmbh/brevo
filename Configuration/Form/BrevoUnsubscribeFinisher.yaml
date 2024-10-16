@@ -1,45 +1,42 @@
-TYPO3:
-  CMS:
-    Form:
-      prototypes:
-        standard:
-          formElementsDefinition:
-            Form:
-              formEditor:
+prototypes:
+  brevo:
+    formElementsDefinition:
+      Form:
+        formEditor:
+          editors:
+            900:
+              selectOptions:
+                1721192420:
+                  value: BrevoUnsubscribe
+                  label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
+          propertyCollections:
+            finishers:
+              1721192445:
+                identifier: BrevoUnsubscribe
                 editors:
-                  900:
-                    selectOptions:
-                      1721192420:
-                        value: BrevoUnsubscribe
-                        label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
-                propertyCollections:
-                  finishers:
-                    1721192445:
-                      identifier: BrevoUnsubscribe
-                      editors:
-                        100:
-                          identifier: header
-                          templateName: Inspector-CollectionElementHeaderEditor
-                          label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
-                        120:
-                          identifier: listIds
-                          templateName: Inspector-TextEditor
-                          label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.listIds.label
-                          propertyPath: options.listIds
-                          propertyValidators:
-                            10: NotEmpty
-                        150:
-                          identifier: removeButton
-                          templateName: Inspector-RemoveElementEditor
-          finishersDefinition:
-            BrevoUnsubscribe:
-              implementationClassName: Remind\Brevo\Domain\Finishers\BrevoUnsubscribeFinisher
-              formEditor:
-                iconIdentifier: form-finisher
-              FormEngine:
-                label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
-                elements:
-                  listIds:
-                    label: listIds
-                    config:
-                      type: input
+                  100:
+                    identifier: header
+                    templateName: Inspector-CollectionElementHeaderEditor
+                    label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
+                  120:
+                    identifier: listIds
+                    templateName: Inspector-TextEditor
+                    label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.listIds.label
+                    propertyPath: options.listIds
+                    propertyValidators:
+                      10: NotEmpty
+                  150:
+                    identifier: removeButton
+                    templateName: Inspector-RemoveElementEditor
+    finishersDefinition:
+      BrevoUnsubscribe:
+        implementationClassName: Remind\Brevo\Domain\Finishers\BrevoUnsubscribeFinisher
+        formEditor:
+          iconIdentifier: form-finisher
+        FormEngine:
+          label: formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label
+          elements:
+            listIds:
+              label: listIds
+              config:
+                type: input

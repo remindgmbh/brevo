@@ -1,11 +1,21 @@
-TYPO3:
-  CMS:
-    Form:
-      prototypes:
-        standard:
-          formEditor:
-            translationFiles:
-              1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"
-          formEngine:
-            translationFiles:
-              1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"
+formManager:
+  translationFiles:
+    1729083363: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"
+  selectablePrototypesConfiguration:
+    1729083262:
+      identifier: brevo
+      label: formManager.selectablePrototypesConfiguration.brevo.label
+      newFormTemplates:
+        100:
+          templatePath: "EXT:form/Resources/Private/Backend/Templates/FormEditor/Yaml/NewForms/BlankForm.yaml"
+          label: formManager.selectablePrototypesConfiguration.standard.newFormTemplates.blankForm.label
+prototypes:
+  brevo:
+    __inheritances:
+      10: "TYPO3.CMS.Form.prototypes.standard"
+    formEditor:
+      translationFiles:
+        1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"
+    formEngine:
+      translationFiles:
+        1674544680: "EXT:rmnd_brevo/Resources/Private/Language/locallang.xlf"

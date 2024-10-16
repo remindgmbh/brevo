@@ -8,7 +8,7 @@ use Brevo\Client\Model\CreateDoiContact;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
 
-class BrevoRegistrationFinisher extends AbstractBrevoFinisher
+class BrevoSubscribeFinisher extends AbstractBrevoFinisher
 {
     protected function executeInternal()
     {
