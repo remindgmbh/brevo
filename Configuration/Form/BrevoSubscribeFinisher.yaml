@@ -45,6 +45,11 @@ prototypes:
                       10: Integer
                       20: FormElementIdentifierWithinCurlyBracesExclusive
                   150:
+                    identifier: updateExistingContact
+                    templateName: Inspector-CheckboxEditor
+                    label: formEditor.elements.Form.finisher.BrevoSubscribe.editor.updateExistingContact.label
+                    propertyPath: options.updateExistingContact
+                  160:
                     identifier: removeButton
                     templateName: Inspector-RemoveElementEditor
     finishersDefinition:
@@ -74,3 +79,8 @@ prototypes:
                 fieldWizard:
                   recordsOverview:
                     disabled: 1
+            updateExistingContact:
+              label: formEditor.elements.Form.finisher.BrevoSubscribe.editor.updateExistingContact.label
+              config:
+                type: check
+                default: 0

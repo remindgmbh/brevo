@@ -24,6 +24,9 @@
             <trans-unit id="formEditor.elements.Form.finisher.BrevoSubscribe.editor.redirectPage.buttonLabel">
                 <source>Page</source>
             </trans-unit>
+            <trans-unit id="formEditor.elements.Form.finisher.BrevoSubscribe.editor.updateExistingContact.label">
+                <source>Update Existing Contact</source>
+            </trans-unit>
             <trans-unit id="formEditor.elements.Form.finisher.BrevoUnsubscribe.editor.header.label">
                 <source>Brevo Unsubscribe</source>
             </trans-unit>
