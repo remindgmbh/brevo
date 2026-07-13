@@ -45,11 +45,23 @@ prototypes:
                       10: Integer
                       20: FormElementIdentifierWithinCurlyBracesExclusive
                   150:
+                    identifier: errorPage
+                    templateName: Inspector-Typo3WinBrowserEditor
+                    buttonLabel: 'Page'
+                    browsableType: pages
+                    iconIdentifier: apps-pagetree-page-default
+                    label: 'Error Page'
+                    propertyPath: options.errorPage
+                    propertyValidatorsMode: OR
+                    propertyValidators:
+                      10: Integer
+                      20: FormElementIdentifierWithinCurlyBracesExclusive
+                  160:
                     identifier: updateExistingContact
                     templateName: Inspector-CheckboxEditor
                     label: formEditor.elements.Form.finisher.BrevoSubscribe.editor.updateExistingContact.label
                     propertyPath: options.updateExistingContact
-                  160:
+                  170:
                     identifier: removeButton
                     templateName: Inspector-RemoveElementEditor
     finishersDefinition:
@@ -75,6 +87,17 @@ prototypes:
                 allowed: pages
                 size: 1
                 minitems: 1
+                maxitems: 1
+                fieldWizard:
+                  recordsOverview:
+                    disabled: 1
+            errorPage:
+              label: 'Error Page'
+              config:
+                type: group
+                allowed: pages
+                size: 1
+                minitems: 0
                 maxitems: 1
                 fieldWizard:
                   recordsOverview:
