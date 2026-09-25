@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Domain\Finishers;
 
-use Brevo\Client\ApiException;
-use Brevo\Client\Model\RemoveContactFromList;
+use Brevo\Contacts\Requests\RemoveContactFromListRequest;
+use Brevo\Contacts\Types\RemoveContactFromListRequestBodyEmails;
+use Brevo\Exceptions\BrevoApiException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
@@ -20,7 +21,7 @@ class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
         $formRuntime = $this->finisherContext->getFormRuntime();
         $formDefinition = $formRuntime->getFormDefinition();
 
-        $contact = new RemoveContactFromList();
+        $emails = [];
 
         foreach ($formValues as $key => $value) {
             $element = $formDefinition->getElementByIdentifier($key);
@@ -28,17 +29,24 @@ class BrevoUnsubscribeFinisher extends AbstractBrevoFinisher
                 $properties = $element->getProperties();
                 $brevoAttribute = $properties['brevoAttribute'] ?? null;
                 if ($brevoAttribute === 'EMAIL') {
-                    $contact->setEmails([$value]);
+                    $emails[] = $value;
                     break;
                 }
             }
         }
 
-        if (!empty($contact->getEmails())) {
+        if (!empty($emails)) {
             foreach ($listIds as $listId) {
                 try {
-                    $this->contactsApi->removeContactFromList($listId, $contact);
-                } catch (ApiException $e) {
+                    $this->contactsClient->removeContactFromList(
+                        $listId,
+                        new RemoveContactFromListRequest([
+                            'body' => new RemoveContactFromListRequestBodyEmails([
+                                'emails' => $emails,
+                            ]),
+                        ]),
+                    );
+                } catch (BrevoApiException $e) {
                     // catch exception if contact is not in list
                     if ($e->getCode() !== 400) {
                         throw $e;

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Domain\Finishers;
 
-use Brevo\Client\Api\ContactsApi;
+use Brevo\Contacts\ContactsClient;
 use Remind\Brevo\Service\BrevoService;
 use TYPO3\CMS\Form\Domain\Finishers\AbstractFinisher;
 
 abstract class AbstractBrevoFinisher extends AbstractFinisher
 {
-    protected ContactsApi $contactsApi;
+    protected ContactsClient $contactsClient;
 
     public function __construct(
         BrevoService $brevoService,
     ) {
-        $this->contactsApi = $brevoService->getContactsApi();
+        $this->contactsClient = $brevoService->getContactsClient();
     }
 }
