@@ -90,6 +90,11 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         }
     }
 
+    /**
+     * @param array<string, mixed> $contactData
+     * @param array<string, mixed> $attributes
+     * @param array<int> $listIds
+     */
     protected function createDoiContact(FormRuntime $formRuntime, array $contactData, int $redirectPage, array $attributes, array $listIds, int $templateId): void
     {
         $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
@@ -106,6 +111,9 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         $this->contactsClient->createDoiContact(new CreateDoiContactRequest($contactData));
     }
 
+    /**
+     * @param array<int> $listIds
+     */
     protected function subscribeContact(string $email, array $listIds): void
     {
         foreach ($listIds as $listId) {
@@ -136,6 +144,9 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         }
     }
 
+    /**
+     * @param array<int> $listIds
+     */
     protected function contactIsSubscribed(string $email, array $listIds): bool
     {
         /** @phpstan-ignore-next-line argument.type */

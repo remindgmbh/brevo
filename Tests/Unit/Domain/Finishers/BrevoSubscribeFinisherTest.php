@@ -167,22 +167,37 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
             ->willReturn($formRuntime);
 
         $contactsClient = new class extends ContactsClient {
-            public bool $updateContactCalled = false;
-            public ?UpdateContactRequest $receivedRequest = null;
-            public ?string $receivedIdentifier = null;
+            private bool $updateContactCalled = false;
+            private ?UpdateContactRequest $receivedRequest = null;
+            private ?string $receivedIdentifier = null;
 
             public function __construct()
             {
             }
 
-            public function updateContact(string|int $identifier, UpdateContactRequest $request = new UpdateContactRequest(), ?array $options = null): void
+            public function wasUpdateContactCalled(): bool
+            {
+                return $this->updateContactCalled;
+            }
+
+            public function getReceivedRequest(): ?UpdateContactRequest
+            {
+                return $this->receivedRequest;
+            }
+
+            public function getReceivedIdentifier(): ?string
+            {
+                return $this->receivedIdentifier;
+            }
+
+            public function updateContact(string|int $identifier, UpdateContactRequest $request = new UpdateContactRequest(), ?array $_options = null): void
             {
                 $this->updateContactCalled = true;
                 $this->receivedIdentifier = (string) $identifier;
                 $this->receivedRequest = $request;
             }
 
-            public function createDoiContact(CreateDoiContactRequest $request, ?array $options = null): void
+            public function createDoiContact(CreateDoiContactRequest $_request, ?array $_options = null): void
             {
                 throw new Exception('createDoiContact should not be called for existing contacts');
             }
