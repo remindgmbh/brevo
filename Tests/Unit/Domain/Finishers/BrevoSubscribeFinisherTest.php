@@ -190,6 +190,7 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
                 return $this->receivedIdentifier;
             }
 
+            /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
             public function updateContact(string|int $identifier, UpdateContactRequest $request = new UpdateContactRequest(), ?array $_options = null): void
             {
                 $this->updateContactCalled = true;
@@ -197,6 +198,7 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
                 $this->receivedRequest = $request;
             }
 
+            /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
             public function createDoiContact(CreateDoiContactRequest $_request, ?array $_options = null): void
             {
                 throw new Exception('createDoiContact should not be called for existing contacts');
