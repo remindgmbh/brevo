@@ -66,7 +66,6 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
                 }
 
                 if (!$this->contactIsSubscribed($email, $listIds)) {
-                    /** @phpstan-ignore-next-line argument.type */
                     $this->subscribeContact($email, $listIds);
                     return null;
                 }
@@ -77,7 +76,6 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
 
                 return null;
             }
-            /** @phpstan-ignore-next-line argument.type */
             $this->createDoiContact($formRuntime, $doiContact, $redirectPage, $attributes, $listIds, $templateId);
 
             return null;
@@ -108,6 +106,7 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         $contactData['listIds'] = $listIds;
         $contactData['templateId'] = $templateId;
         $contactData['redirectionUrl'] = $redirectionUrl;
+        /** @phpstan-ignore-next-line argument.type */
         $this->contactsClient->createDoiContact(new CreateDoiContactRequest($contactData));
     }
 
@@ -133,7 +132,6 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
     protected function contactExists(string $email): bool
     {
         try {
-            /** @phpstan-ignore-next-line argument.type */
             $this->contactsClient->getContactInfo($email, new GetContactInfoRequest(['identifierType' => 'email_id']));
             return true;
         } catch (BrevoApiException $e) {
@@ -149,9 +147,9 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
      */
     protected function contactIsSubscribed(string $email, array $listIds): bool
     {
-        /** @phpstan-ignore-next-line argument.type */
         $contact = $this->contactsClient->getContactInfo($email, new GetContactInfoRequest(['identifierType' => 'email_id']));
         foreach ($listIds as $listId) {
+            /** @phpstan-ignore-next-line argument.type */
             if (in_array($listId, $contact->listIds, true)) {
                 return true;
             }

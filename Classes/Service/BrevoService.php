@@ -21,6 +21,7 @@ class BrevoService
         $client = new Brevo(
             apiKey: $apiKey,
         );
+        /** @phpstan-ignore-next-line argument.type */
         $this->contactsClient = $client->getContacts();
     }
 
