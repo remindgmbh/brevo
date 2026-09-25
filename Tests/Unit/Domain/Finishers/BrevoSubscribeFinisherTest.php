@@ -168,9 +168,9 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
 
         $contactsClient = new class extends ContactsClient {
             private bool $updateContactCalled = false;
-            
+
             private ?UpdateContactRequest $receivedRequest = null;
-            
+
             private ?string $receivedIdentifier = null;
 
             public function __construct()
