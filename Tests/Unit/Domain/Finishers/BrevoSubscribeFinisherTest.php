@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Tests\Unit\Domain\Finishers;
 
-use Brevo\Client\Api\ContactsApi;
-use Brevo\Client\ApiException;
-use Brevo\Client\Model\UpdateContact;
+use Brevo\Contacts\ContactsClient;
+use Brevo\Contacts\Requests\CreateDoiContactRequest;
+use Brevo\Contacts\Requests\GetContactInfoRequest;
+use Brevo\Contacts\Requests\UpdateContactRequest;
+use Brevo\Exceptions\BrevoApiException;
+use Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use Remind\Brevo\Domain\Finishers\BrevoSubscribeFinisher;
@@ -20,19 +23,27 @@ use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 #[CoversClass(BrevoSubscribeFinisher::class)]
 class BrevoSubscribeFinisherTest extends UnitTestCase
 {
+    protected bool $resetSingletonInstances = true;
+
     #[Test]
     public function contactExistsReturnsTrueWhenContactInfoIsFound(): void
     {
-        $contactsApi = $this->createMock(ContactsApi::class);
-        $contactsApi
+        $contactsClient = $this->createMock(ContactsClient::class);
+        $contactsClient
             ->expects($this->once())
             ->method('getContactInfo')
-            ->with('jane@example.com', 'email_id');
+            ->with(
+                'jane@example.com',
+                $this->callback(static function (GetContactInfoRequest $request): bool {
+                    return $request->identifierType === 'email_id';
+                })
+            )
+            ->willReturn(null);
 
         $brevoService = $this->createMock(BrevoService::class);
         $brevoService
-            ->method('getContactsApi')
-            ->willReturn($contactsApi);
+            ->method('getContactsClient')
+            ->willReturn($contactsClient);
 
         $finisher = new class ($brevoService) extends BrevoSubscribeFinisher {
             public function contactExistsProxy(string $email): bool
@@ -47,17 +58,22 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
     #[Test]
     public function contactExistsReturnsFalseOn404ApiException(): void
     {
-        $contactsApi = $this->createMock(ContactsApi::class);
-        $contactsApi
+        $contactsClient = $this->createMock(ContactsClient::class);
+        $contactsClient
             ->expects($this->once())
             ->method('getContactInfo')
-            ->with('unknown@example.com', 'email_id')
-            ->willThrowException(new ApiException('Not found', 404));
+            ->with(
+                'unknown@example.com',
+                $this->callback(static function (GetContactInfoRequest $request): bool {
+                    return $request->identifierType === 'email_id';
+                })
+            )
+            ->willThrowException(new BrevoApiException('Not found', 404, ['error' => 'not found']));
 
         $brevoService = $this->createMock(BrevoService::class);
         $brevoService
-            ->method('getContactsApi')
-            ->willReturn($contactsApi);
+            ->method('getContactsClient')
+            ->willReturn($contactsClient);
 
         $finisher = new class ($brevoService) extends BrevoSubscribeFinisher {
             public function contactExistsProxy(string $email): bool
@@ -72,17 +88,22 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
     #[Test]
     public function contactExistsRethrowsNon404ApiException(): void
     {
-        $contactsApi = $this->createMock(ContactsApi::class);
-        $contactsApi
+        $contactsClient = $this->createMock(ContactsClient::class);
+        $contactsClient
             ->expects($this->once())
             ->method('getContactInfo')
-            ->with('error@example.com', 'email_id')
-            ->willThrowException(new ApiException('Server error', 500));
+            ->with(
+                'error@example.com',
+                $this->callback(static function (GetContactInfoRequest $request): bool {
+                    return $request->identifierType === 'email_id';
+                })
+            )
+            ->willThrowException(new BrevoApiException('Server error', 500, ['error' => 'server']));
 
         $brevoService = $this->createMock(BrevoService::class);
         $brevoService
-            ->method('getContactsApi')
-            ->willReturn($contactsApi);
+            ->method('getContactsClient')
+            ->willReturn($contactsClient);
 
         $finisher = new class ($brevoService) extends BrevoSubscribeFinisher {
             public function contactExistsProxy(string $email): bool
@@ -91,7 +112,7 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
             }
         };
 
-        $this->expectException(ApiException::class);
+        $this->expectException(BrevoApiException::class);
         $this->expectExceptionCode(500);
 
         $finisher->contactExistsProxy('error@example.com');
@@ -145,27 +166,51 @@ class BrevoSubscribeFinisherTest extends UnitTestCase
             ->method('getFormRuntime')
             ->willReturn($formRuntime);
 
-        $contactsApi = $this->createMock(ContactsApi::class);
-        $contactsApi
-            ->expects($this->once())
-            ->method('updateContact')
-            ->with(
-                $this->callback(static function (UpdateContact $updateContact): bool {
-                    $attributes = (array) $updateContact->getAttributes();
-                    return $attributes['OPT_IN'] === true
-                        && $updateContact->getListIds() === [3, 5];
-                }),
-                'jane@example.com',
-                'email_id'
-            );
-        $contactsApi
-            ->expects($this->never())
-            ->method('createDoiContact');
+        $contactsClient = new class extends ContactsClient {
+            private bool $updateContactCalled = false;
+
+            private ?UpdateContactRequest $receivedRequest = null;
+
+            private ?string $receivedIdentifier = null;
+
+            public function __construct()
+            {
+            }
+
+            public function wasUpdateContactCalled(): bool
+            {
+                return $this->updateContactCalled;
+            }
+
+            public function getReceivedRequest(): ?UpdateContactRequest
+            {
+                return $this->receivedRequest;
+            }
+
+            public function getReceivedIdentifier(): ?string
+            {
+                return $this->receivedIdentifier;
+            }
+
+            /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+            public function updateContact(string|int $identifier, UpdateContactRequest $request = new UpdateContactRequest(), ?array $_options = null): void
+            {
+                $this->updateContactCalled = true;
+                $this->receivedIdentifier = (string) $identifier;
+                $this->receivedRequest = $request;
+            }
+
+            /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+            public function createDoiContact(CreateDoiContactRequest $_request, ?array $_options = null): void
+            {
+                throw new Exception('createDoiContact should not be called for existing contacts');
+            }
+        };
 
         $brevoService = $this->createMock(BrevoService::class);
         $brevoService
-            ->method('getContactsApi')
-            ->willReturn($contactsApi);
+            ->method('getContactsClient')
+            ->willReturn($contactsClient);
 
         $finisher = new class ($brevoService) extends BrevoSubscribeFinisher {
             /** @var array<string, mixed> */

@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Remind\Brevo\Domain\Finishers;
 
-use Brevo\Client\ApiException;
-use Brevo\Client\Model\CreateDoiContact;
-use Brevo\Client\Model\UpdateContact;
+use Brevo\Contacts\Requests\AddContactToListRequest;
+use Brevo\Contacts\Requests\CreateDoiContactRequest;
+use Brevo\Contacts\Requests\GetContactInfoRequest;
+use Brevo\Contacts\Requests\UpdateContactRequest;
+use Brevo\Contacts\Types\AddContactToListRequestBodyEmails;
+use Brevo\Exceptions\BrevoApiException;
 use Throwable;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Web\Routing\UriBuilder;
+use TYPO3\CMS\Form\Domain\Runtime\FormRuntime;
 
 class BrevoSubscribeFinisher extends AbstractBrevoFinisher
 {
@@ -27,7 +31,7 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         $formRuntime = $this->finisherContext->getFormRuntime();
         $formDefinition = $formRuntime->getFormDefinition();
 
-        $createDoiContact = new CreateDoiContact();
+        $doiContact = [];
 
         $attributes = [];
         foreach ($formValues as $key => $value) {
@@ -36,7 +40,7 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
             $brevoAttribute = $properties['brevoAttribute'] ?? null;
             if ($brevoAttribute) {
                 if ($brevoAttribute === 'EMAIL') {
-                    $createDoiContact->setEmail($value);
+                    $doiContact['email'] = $value;
                 } else {
                     $type = $element?->getType();
                     if ($type === 'Checkbox') {
@@ -47,17 +51,22 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
             }
         }
 
-        $email = $createDoiContact->getEmail();
+        $email = $doiContact['email'] ?? '';
 
         try {
             if ($this->contactExists($email)) {
                 if ($updateExistingContact) {
-                    $updateContact = new UpdateContact();
-                    $updateContact->setAttributes((object) $attributes);
-                    $updateContact->setListIds($listIds);
                     /** @phpstan-ignore-next-line argument.type */
-                    $this->contactsApi->updateContact($updateContact, $email, 'email_id');
+                    $this->contactsClient->updateContact($email, new UpdateContactRequest([
+                            'attributes' => (object) $attributes,
+                            'identifierType' => 'email_id',
+                            'listIds' => $listIds,
+                        ]));
+                    return null;
+                }
 
+                if (!$this->contactIsSubscribed($email, $listIds)) {
+                    $this->subscribeContact($email, $listIds);
                     return null;
                 }
 
@@ -67,19 +76,7 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
 
                 return null;
             }
-
-            $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
-            $redirectionUrl = $uriBuilder
-                ->setRequest($formRuntime->getRequest())
-                ->setCreateAbsoluteUri(true)
-                ->setTargetPageUid($redirectPage)
-                ->build();
-
-            $createDoiContact->setAttributes((object) $attributes);
-            $createDoiContact->setIncludeListIds($listIds);
-            $createDoiContact->setTemplateId($templateId);
-            $createDoiContact->setRedirectionUrl($redirectionUrl);
-            $this->contactsApi->createDoiContact($createDoiContact);
+            $this->createDoiContact($formRuntime, $doiContact, $redirectPage, $attributes, $listIds, $templateId);
 
             return null;
         } catch (Throwable) {
@@ -91,18 +88,73 @@ class BrevoSubscribeFinisher extends AbstractBrevoFinisher
         }
     }
 
+    /**
+     * @param array<string, mixed> $contactData
+     * @param array<string, mixed> $attributes
+     * @param array<int> $listIds
+     */
+    protected function createDoiContact(FormRuntime $formRuntime, array $contactData, int $redirectPage, array $attributes, array $listIds, int $templateId): void
+    {
+        $uriBuilder = GeneralUtility::makeInstance(UriBuilder::class);
+        $redirectionUrl = $uriBuilder
+            ->setRequest($formRuntime->getRequest())
+            ->setCreateAbsoluteUri(true)
+            ->setTargetPageUid($redirectPage)
+            ->build();
+
+        $contactData['attributes'] = (object) $attributes;
+        $contactData['listIds'] = $listIds;
+        $contactData['templateId'] = $templateId;
+        $contactData['redirectionUrl'] = $redirectionUrl;
+        /** @phpstan-ignore-next-line argument.type */
+        $this->contactsClient->createDoiContact(new CreateDoiContactRequest($contactData));
+    }
+
+    /**
+     * @param array<int> $listIds
+     */
+    protected function subscribeContact(string $email, array $listIds): void
+    {
+        foreach ($listIds as $listId) {
+            $this->contactsClient->addContactToList(
+                $listId,
+                new AddContactToListRequest([
+                    'body' => new AddContactToListRequestBodyEmails([
+                        'emails' => [
+                            $email,
+                        ],
+                    ]),
+                ])
+            );
+        }
+    }
+
     protected function contactExists(string $email): bool
     {
         try {
-            /** @phpstan-ignore-next-line argument.type */
-            $this->contactsApi->getContactInfo($email, 'email_id');
+            $this->contactsClient->getContactInfo($email, new GetContactInfoRequest(['identifierType' => 'email_id']));
             return true;
-        } catch (ApiException $e) {
+        } catch (BrevoApiException $e) {
             if ($e->getCode() === 404) {
                 return false;
             }
             throw $e;
         }
+    }
+
+    /**
+     * @param array<int> $listIds
+     */
+    protected function contactIsSubscribed(string $email, array $listIds): bool
+    {
+        $contact = $this->contactsClient->getContactInfo($email, new GetContactInfoRequest(['identifierType' => 'email_id']));
+        foreach ($listIds as $listId) {
+            /** @phpstan-ignore-next-line argument.type */
+            if (in_array($listId, $contact->listIds, true)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected function buildRedirectResponse(int $targetPage): string
